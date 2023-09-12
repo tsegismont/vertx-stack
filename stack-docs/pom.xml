@@ -454,15 +454,12 @@
       <version>${vertx.docs.version}</version>
       <classifier>sources</classifier>
     </dependency>
-    <!--
-      todo: does not pass currently
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-oracle-client</artifactId>
       <version>${vertx.docs.version}</version>
       <classifier>sources</classifier>
     </dependency>
-    -->
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-mssql-client</artifactId>
@@ -1572,6 +1569,10 @@
       <artifactId>netty-codec-haproxy</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport-native-kqueue</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-jmx</artifactId>
       <version>1.0.5</version>
@@ -1629,6 +1630,21 @@
       <groupId>io.agroal</groupId>
       <artifactId>agroal-pool</artifactId>
       <version>1.11</version>
+    </dependency>
+    <dependency>
+      <groupId>io.swagger.parser.v3</groupId>
+      <artifactId>swagger-parser-v3</artifactId>
+      <version>2.1.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.dataformat</groupId>
+          <artifactId>jackson-dataformat-yaml</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jakarta.xml.bind</groupId>
+          <artifactId>jakarta.xml.bind-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -2110,4 +2126,59 @@
 
     </plugins>
   </build>
+
+  <!-- Java 8 => use Maven Toolchain to compile this module with JDK 11
+     The config file .m2/toolchains.xml is needed with this content
+
+     <toolchains>
+       <toolchain>
+         <type>jdk</type>
+         <provides>
+           <id>Java11</id>
+           <version>11</version>
+         </provides>
+         <configuration>
+           <jdkHome>/PATH/TO/JDK/11</jdkHome>
+         </configuration>
+       </toolchain>
+     </toolchains>
+-->
+  <profiles>
+    <profile>
+      <id>Java8</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.bsc.maven</groupId>
+            <artifactId>maven-processor-plugin</artifactId>
+            <version>5.0-jdk8-rc3</version>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-toolchains-plugin</artifactId>
+            <version>1.0</version>
+            <executions>
+              <execution>
+                <phase>validate</phase>
+                <goals>
+                  <goal>toolchain</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <toolchains>
+                <jdk>
+                  <version>11</version>
+                </jdk>
+              </toolchains>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
